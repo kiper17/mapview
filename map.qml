@@ -13,16 +13,10 @@ Window {
         id: mapPlugin
         name: "osm"
 
-        parameters: [
-            PluginParameter {
-                name: "osm.mapping.custom.host"
-                value: "https://tile.thunderforest.com/cycle/"
-            },
-            PluginParameter {
-                name: "osm.mapping.custom.apikey"
-                value: "6cbc7a5bdc0d40a89f44cc597d617a1b"
-            }
-        ]
+        PluginParameter {
+            name: "osm.mapping.custom.host";
+            value: "http://tile.thunderforest.com/landscape/%z/%x/%y.png?apikey=<your api>&fake=.png"
+        }
     }
 
     Map {
@@ -31,5 +25,23 @@ Window {
         plugin: mapPlugin
         center: QtPositioning.coordinate(59.2205, 39.8915)
         zoomLevel: 12
+        activeMapType: supportedMapTypes[supportedMapTypes.length - 1]
+
+        //Изменение zoom колесиком мыши
+        WheelHandler {
+            id: wheel
+            acceptedDevices: Qt.platform.pluginName === "cocoa" || Qt.platform.pluginName === "wayland"
+                            ? PointerDevice.Mouse | PointerDevice.TouchPad
+                            : PointerDevice.Mouse
+                rotationScale: 1/120
+                property: "zoomLevel"
+        }
+        //Перемещение с помощью зажима левой кнопки мыши
+        DragHandler {
+            id: drag
+            target: null
+            onTranslationChanged: (delta) => map.pan(-delta.x, -delta.y)
+        }
     }
 }
+
